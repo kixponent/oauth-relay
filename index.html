@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>로그인 확인 중</title>
+</head>
+<body style="font-family:system-ui,sans-serif;max-width:480px;margin:40px auto;padding:0 16px">
+<p id="m">로그인 확인 중…</p>
+<script>
+// Google OAuth redirect relay: forwards ?code&state to the origin named in state.u,
+// only if it is a Cloudflare quick-tunnel address. Holds no secrets; the code is
+// useless without the server's client secret and PKCE verifier.
+(function () {
+  var q = new URLSearchParams(location.search);
+  var target = null;
+  try {
+    var s = (q.get("state") || "").replace(/-/g, "+").replace(/_/g, "/");
+    while (s.length % 4) s += "=";
+    target = JSON.parse(atob(s)).u;
+  } catch (e) {}
+  if (typeof target === "string" && /^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/.test(target)) {
+    location.replace(target + "/auth/callback" + location.search);
+  } else {
+    document.getElementById("m").textContent = "잘못된 요청입니다.";
+  }
+})();
+</script>
+</body>
+</html>
